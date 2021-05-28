@@ -12,19 +12,20 @@ First, import libraries and set up environment and global variables.
 """
 
 import cv2 as cv
-from google.colab import drive
-from google.colab.patches import cv2_imshow
+#from google.colab import drive
+#from google.colab.patches import cv2_imshow
 import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import pandas as pd
 
-ROOT_PATH = 'drive/My Drive/2021 Spring/CV/Final Project/sign_data/'
-MAX_WORDS = 300 # The number of "visual words" to keep in the "dictionary"
+#ROOT_PATH = 'drive/My Drive/2021 Spring/CV/Final Project/sign_data/'
+ROOT_PATH = '/usa/macbride/projects/cv_final/sign_data/train/'
+MAX_WORDS = 500 # The number of "visual words" to keep in the "dictionary"
 #LOAD_MAX_PCT = 0.25 # The percent of images to load and process
-LOAD_MAX = 320 # The number of images to load and process
+#LOAD_MAX = 320 # The number of images to load and process
 
-drive.mount('/content/drive')
+#drive.mount('/content/drive')
 
 """Define functions for later use."""
 
@@ -57,8 +58,8 @@ def prep_data():
   file_info = pd.read_csv(file_info_path)
   # Get a subset of files so data fits in memory
   #file_info = file_info.sample(frac=LOAD_MAX_PCT,random_state=1)
-  filenames = list(file_info.iloc[:320,1])
-  classes = list(file_info.iloc[:320,2])
+  filenames = list(file_info.iloc[:,1])
+  classes = list(file_info.iloc[:,2])
 
   # Read each image listed in unique.csv, then extract its feature descriptors 
   # using ORB. Assign those features to the nearest "visual word" using KMeans.
@@ -70,6 +71,7 @@ def prep_data():
   all_descriptors = [] # Use to create KMeans clusters
   img_descriptors = [] # Use to create each image's freq_count
   for filename in filenames:
+    print("Loading %s..." % filename)
     img_path = ROOT_PATH + 'sign_data/train/' + filename
     img = cv.imread(img_path, 0)
     keypoints, descriptors = get_features(img, orb)
@@ -87,21 +89,21 @@ def prep_data():
 
 """Load some test images and create an ORB extractor."""
 
-path = 'drive/My Drive/2021 Spring/CV/Final Project/sign_data'
-sign_img = cv.imread(path + '/train/069/12_069.png', 0)
-forg_img = cv.imread(path + '/train/069_forg/04_0111069.PNG', 0)
+#path = 'drive/My Drive/2021 Spring/CV/Final Project/sign_data'
+#sign_img = cv.imread(path + '/train/069/12_069.png', 0)
+#forg_img = cv.imread(path + '/train/069_forg/04_0111069.PNG', 0)
 
-orb = cv.ORB_create(nfeatures=1800)
+#orb = cv.ORB_create(nfeatures=1800)
 
 """Use ORB to get features from test images. See what features are detected."""
 
-keypoints, descriptors = get_features(sign_img, orb)
-keypoint_img = cv.drawKeypoints(sign_img, keypoints, None, color=(255, 127, 0), flags=0)
-cv2_imshow(keypoint_img)
+#keypoints, descriptors = get_features(sign_img, orb)
+#keypoint_img = cv.drawKeypoints(sign_img, keypoints, None, color=(255, 127, 0), flags=0)
+#cv2_imshow(keypoint_img)
 
-keypoints, descriptors = get_features(forg_img, orb)
-keypoint_img = cv.drawKeypoints(forg_img, keypoints, None, color=(255, 127, 0), flags=0)
-cv2_imshow(keypoint_img)
+#keypoints, descriptors = get_features(forg_img, orb)
+#keypoint_img = cv.drawKeypoints(forg_img, keypoints, None, color=(255, 127, 0), flags=0)
+#cv2_imshow(keypoint_img)
 
 """Preprocess the data by loading image files, getting their features, getting the closest "visual words" for each feature, compiling frequency counts of those words for each image, and pairing those counts with a class label (i.e. forgery or genuine)."""
 
@@ -119,5 +121,5 @@ img_data_path = ROOT_PATH + 'prep_img_data.csv'
 img_data.to_csv(img_data_path)
 
 # Check that data was saved properly.
-img_data_chk = pd.read_csv(img_data_path)
-img_data_chk
+#img_data_chk = pd.read_csv(img_data_path)
+#img_data_chk
