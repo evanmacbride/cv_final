@@ -18,9 +18,10 @@ import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import pandas as pd
+from os import sys
 
 #ROOT_PATH = 'drive/My Drive/2021 Spring/CV/Final Project/sign_data/'
-ROOT_PATH = '/usa/macbride/projects/cv_final/sign_data/train/'
+ROOT_PATH = '/usa/macbride/projects/cv_final/sign_data/'
 MAX_WORDS = 500 # The number of "visual words" to keep in the "dictionary"
 #LOAD_MAX_PCT = 0.25 # The percent of images to load and process
 #LOAD_MAX = 320 # The number of images to load and process
@@ -34,7 +35,9 @@ def get_features(img, extractor):
   Return features (i.e. keypoints and descriptors) from an image using an extractor 
   (i.e. ORB).
   '''
+  print("Getting features...")
   keypoints, descriptors = extractor.detectAndCompute(img, None)
+  print("Features obtained.")
   return keypoints, descriptors
 
 def get_freq_count(descriptors, algorithm):
@@ -74,11 +77,19 @@ def prep_data():
     print("Loading %s..." % filename)
     img_path = ROOT_PATH + 'sign_data/train/' + filename
     img = cv.imread(img_path, 0)
+    if (img is not None):
+        print("Image loaded.")
+    else:
+        print("Image load failed. Exiting...")
+        sys.exit()
     keypoints, descriptors = get_features(img, orb)
+    #if (descriptors):
+    #    print("Descriptors loaded.")
     del img
     img_descriptors.append(descriptors)
     for descriptor in descriptors:
       all_descriptors.append(descriptor)
+    print("Descriptors added to lists.")
   print("Images loaded. Fitting KMeans...")
   kmeans.fit(all_descriptors)
   print("KMeans fit. Getting freq_counts...")
